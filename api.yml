@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  title: 商品管理API
+  description: 商品を管理し、ユーザーの認証を行うAPIです。
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: ローカルサーバー
+
+paths:
+  /items:
+    get:
+      summary: 商品一覧を取得
+      description: 登録されているすべての商品を取得します。
+      responses:
+        '200':
+          description: 商品の一覧を返します。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      summary: 新しい商品を作成
+      description: 新しい商品を登録します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItemInput'
+      responses:
+        '201':
+          description: 作成された商品を返します。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+
+  /items/{id}:
+    get:
+      summary: 商品をIDで取得
+      description: 指定されたIDの商品を取得します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 商品のID
+      responses:
+        '200':
+          description: 指定されたIDの商品を返します。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '404':
+          description: 商品が見つかりません。
+    put:
+      summary: 商品を更新
+      description: 指定されたIDの商品を更新します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 更新する商品のID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateItemInput'
+      responses:
+        '200':
+          description: 更新された商品を返します。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '404':
+          description: 商品が見つかりません。
+    delete:
+      summary: 商品を削除
+      description: 指定されたIDの商品を削除します。
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 削除する商品のID
+      responses:
+        '200':
+          description: 商品が正常に削除されました。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 商品が削除されました。
+        '404':
+          description: 商品が見つかりません。
+
+  /auth/signup:
+    post:
+      summary: 新しいユーザーを登録
+      description: 新しいユーザーを登録します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpInput'
+      responses:
+        '201':
+          description: ユーザーが正常に作成されました。
+        '400':
+          description: 入力データが不正です。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Validation error
+        '500':
+          description: サーバーエラーが発生しました。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to create user
+
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        ID:
+          type: integer
+          description: 商品の一意な識別子
+        Name:
+          type: string
+          description: 商品名
+        Price:
+          type: integer
+          description: 商品の価格
+        Description:
+          type: string
+          description: 商品の説明文
+        SoldOut:
+          type: boolean
+          description: 売り切れ状態
+      required:
+        - ID
+        - Name
+        - Price
+        - Description
+        - SoldOut
+
+    CreateItemInput:
+      type: object
+      properties:
+        Name:
+          type: string
+          description: 商品名
+        Price:
+          type: integer
+          description: 商品の価格
+        Description:
+          type: string
+          description: 商品の説明文
+        SoldOut:
+          type: boolean
+          description: 売り切れ状態
+      required:
+        - Name
+        - Price
+        - Description
+        - SoldOut
+
+    UpdateItemInput:
+      type: object
+      properties:
+        Name:
+          type: string
+          description: 商品名
+        Price:
+          type: integer
+          description: 商品の価格
+        Description:
+          type: string
+          description: 商品の説明文
+        SoldOut:
+          type: boolean
+          description: 売り切れ状態
+
+    SignUpInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: ユーザーのメールアドレス
+        password:
+          type: string
+          description: ユーザーのパスワード
+      required:
+        - email
+        - password
