@@ -48,7 +48,7 @@ func (c *ItemController) FindById(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
